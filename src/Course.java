@@ -7,6 +7,7 @@ public class Course {
 	private String instructor;
 	private String delivery;
 	private String displayName;
+	private boolean isSemester;
 
 	public Course() {
 		this(null, null, null, null, null, null, null);
@@ -20,6 +21,7 @@ public class Course {
 		this.location = location;
 		this.instructor = instructor;
 		this.delivery = delivery;
+		this.isSemester = false;
 	}
 
 	public String getTerm() {
@@ -82,7 +84,7 @@ public class Course {
 		if (format == null || course == null) return null;
 		String newDisplayName = course.substring(0, course.indexOf('-'));
 
-		if (format.equals("Laboratory") || format.equals("Discussion") || format.equals("Workshop")) {
+		if (format.equals("Laboratory") || format.equals("Discussion")) {
 			// Lab/Discussion format (includes group in the name)
 			newDisplayName = course.substring(0, course.indexOf('-', course.indexOf('-') + 1) - 1);
 			if (course.contains("/")) {
@@ -159,6 +161,14 @@ public class Course {
 		}
 
 		return String.valueOf(hour >= 10 ? hour : "0" + hour) + (minute > 0 ? minute : "00") + "00";
+	}
+
+	public boolean isSemester() {
+		return isSemester;
+	}
+
+	public void setSemester(boolean semester) {
+		isSemester = semester;
 	}
 
 	@Override

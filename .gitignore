@@ -5,6 +5,10 @@ out/
 .idea/
 lib/
 *.iml
+*.zip
+*.ics
+*.xlsx
+term_dates.txt
 
 ### Eclipse ###
 .apt_generated

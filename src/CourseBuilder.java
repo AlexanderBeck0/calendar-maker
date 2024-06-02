@@ -2,7 +2,7 @@ public class CourseBuilder {
 	private final Course aCourse = new Course();
 
 	public CourseBuilder setTerm(String term) {
-		aCourse.setTerm(cleanTerm(term));
+		aCourse.setTerm(CourseBuilder.cleanTerm(term));
 		return this;
 	}
 
@@ -41,7 +41,18 @@ public class CourseBuilder {
 		// uncleaned term format is:
 		// YYYY Semester TERM Term
 		// i.e. 2023 Fall A Term
-		return uncleanedTerm.substring(uncleanedTerm.length() - 6, uncleanedTerm.length() - 5);
+		// Or
+		// YYYY SEMESTER Semester
+
+		if (uncleanedTerm.matches("\\d{4} \\w* . Term")) {
+			// 4 Digits, space, N word characters, space, single character, space, "Term"
+			return uncleanedTerm.substring(uncleanedTerm.length() - 6, uncleanedTerm.length() - 5);
+		} else if (uncleanedTerm.matches("\\d{4} \\w* Semester")) {
+			// 4 Digits, space, N word characters, space, "Semester"
+			// Remove the 4 digits, space, and semester
+			return uncleanedTerm.replaceFirst("\\sSemester", "").replaceFirst("\\d{4}\\s", "");
+		}
+		return null;
 	}
 
 	public Course toCourse() {

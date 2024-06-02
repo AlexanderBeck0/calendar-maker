@@ -1,14 +1,23 @@
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 public class CalendarEntryGenerator {
 	private static int[] terms;
+	private static final Map<String, Integer> TERM_MAP = new HashMap<>(8);
 
 	public static void setTerms(int[] terms) {
 		CalendarEntryGenerator.terms = terms;
+	}
+
+	static {
+		// Update the seasons to the term map
+		TERM_MAP.put("Fall", 0);   // Fall starts at index 0
+		TERM_MAP.put("Spring", 4); // Spring starts at index 4
 	}
 
 	/**
@@ -40,13 +49,27 @@ public class CalendarEntryGenerator {
 		// The days of the week of which the course is held
 		String days = course.getDays();
 
-		// Multiply by 2 since there is a start and end of every term
 		String term = course.getTerm();
-		int termIndex = (term.charAt(0) - 65) * 2;
+		int termIndex = CalendarEntryGenerator.getTermIndex(term);
+
+		if (termIndex == -1) {
+			throw new IllegalArgumentException("Invalid term: " + term);
+		}
 
 		// Determine the first day after the starting day of the term that the class has
 		// This prevents all the classes being present on the first day of the term, regardless if that class is actually happening that day
-		String firstDayOfTerm = CalendarEntryGenerator.getDayOfWeek(terms[termIndex]);
+		String firstDayOfTerm;
+		int endTermIndex;
+		if (term.length() > 2) {
+			int startTermIndex = TERM_MAP.get(term);
+			endTermIndex = startTermIndex + 3; // Fall ends at index 3, Spring ends at index 7
+			firstDayOfTerm = CalendarEntryGenerator.getDayOfWeek(terms[startTermIndex]);
+			termIndex = startTermIndex;
+		} else {
+			firstDayOfTerm = CalendarEntryGenerator.getDayOfWeek(terms[termIndex]);
+			endTermIndex = termIndex + 1;
+		}
+
 		int dayShift = 0;
 		while (!days.contains(firstDayOfTerm)) {
 			firstDayOfTerm = CalendarEntryGenerator.getDayOfWeek(terms[termIndex] + dayShift);
@@ -73,7 +96,7 @@ public class CalendarEntryGenerator {
 		return "BEGIN:VEVENT" + delim +
 				"DTSTART;TZID=America/New_York:" + (terms[termIndex] + dayShift) + "T" + course.getStartTime() + delim +
 				"DTEND;TZID=America/New_York:" + (terms[termIndex] + dayShift) + "T" + course.getEndTime() + delim +
-				"RRULE:FREQ=WEEKLY;UNTIL=" + (terms[termIndex + 1] + 1) + "T035959Z;BYDAY=" + days + delim +
+				"RRULE:FREQ=WEEKLY;UNTIL=" + (terms[endTermIndex] + 1) + "T035959Z;BYDAY=" + days + delim +
 				"DTSTAMP:" + currentDate + "Z" + delim +
 				"UID:" + UUID.randomUUID() + delim +
 				"CREATED:" + currentDate + "Z" + delim +
@@ -84,6 +107,23 @@ public class CalendarEntryGenerator {
 				"SUMMARY:" + course.getDisplayName() + delim +
 				"TRANSP:OPAQUE" + delim +
 				"END:VEVENT";
+	}
+
+	/**
+	 * Uses {@link CalendarEntryGenerator#TERM_MAP}
+	 *
+	 * @param term The term to get the term index of
+	 * @return The index of either a {@link CalendarEntryGenerator#TERM_MAP} index, an index to the terms, or -1 if it is not found
+	 */
+	private static int getTermIndex(String term) {
+		if (term.length() == 1) {
+			// Multiply by 2 since there is a start and end of every term
+			// 65 represents 'A'
+			return (term.charAt(0) - 65) * 2;
+		} else {
+			Integer index = TERM_MAP.get(term);
+			return index != null ? index : -1;
+		}
 	}
 
 	/**

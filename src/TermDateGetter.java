@@ -13,7 +13,7 @@ public class TermDateGetter {
 	 * @return An integer array containing the start and end of the terms in the format {@code YYYYMMDD}
 	 */
 	public static int[] getTerms() {
-		int[] dates = new int[8];
+		int[] dates = new int[12];
 		File file = new File(TERM_DATES_FILE_NAME);
 		// Checks if there exists a file containing the term start dates, and if not, creates one by asking the user for the information
 		try {
@@ -21,10 +21,10 @@ public class TermDateGetter {
 			Scanner scanner = new Scanner(file);
 
 			// Loops through the file to get the dates
-			// Includes a fail-safe of 8 terms to prevent index out of bounds
+			// Includes a fail-safe of 12 terms to prevent index out of bounds
 			for (int i = 0; scanner.hasNextLine(); i++) {
 				// If there is too much data, just scrap it and ask the user to input again
-				if (i >= 8) {
+				if (i >= 12) {
 					file.delete();
 					System.out.println("too much data found.");
 					throw new FileNotFoundException("too much data");
@@ -48,7 +48,7 @@ public class TermDateGetter {
 			System.out.println("data found!");
 		} catch (FileNotFoundException e) {
 			// Wipe any and all data in dates
-			dates = new int[8];
+			dates = new int[12];
 			// Error message if the data isn't found
 			if (!e.getMessage().equals("too much data") && !e.getMessage().equals("faulty data")) {
 				System.out.println("data not found.");
@@ -61,16 +61,18 @@ public class TermDateGetter {
 	}
 
 	/**
-	 * Asks the user for dates by using {@link TermDateGetter#getNTermDatesFromUser(char)} and adding the data to {@code dates}
+	 * Asks the user for dates by using {@link TermDateGetter#getNTermDatesFromUser(String)} and adding the data to {@code dates}
 	 *
 	 * @param dates An integer array containing dates. Is modified by the method.
 	 */
 	private static void askUserForDates(int[] dates) {
 		System.out.println("Please respond to the following prompts to enter the term dates: ");
-		int[] aTerm = getNTermDatesFromUser('A');
-		int[] bTerm = getNTermDatesFromUser('B');
-		int[] cTerm = getNTermDatesFromUser('C');
-		int[] dTerm = getNTermDatesFromUser('D');
+		int[] aTerm = TermDateGetter.getNTermDatesFromUser("A");
+		int[] bTerm = TermDateGetter.getNTermDatesFromUser("B");
+		int[] cTerm = TermDateGetter.getNTermDatesFromUser("C");
+		int[] dTerm = TermDateGetter.getNTermDatesFromUser("D");
+		int[] e1Term = TermDateGetter.getNTermDatesFromUser("E1");
+		int[] e2Term = TermDateGetter.getNTermDatesFromUser("E2");
 
 		dates[0] = aTerm[0];
 		dates[1] = aTerm[1];
@@ -83,13 +85,19 @@ public class TermDateGetter {
 
 		dates[6] = dTerm[0];
 		dates[7] = dTerm[1];
+
+		dates[8] = e1Term[0];
+		dates[9] = e1Term[1];
+
+		dates[10] = e2Term[0];
+		dates[11] = e2Term[1];
 	}
 
 	/**
 	 * @param term The term to get the start and end dates of
 	 * @return an integer array containing the first index as the start date and the second index as the end date
 	 */
-	private static int[] getNTermDatesFromUser(char term) {
+	private static int[] getNTermDatesFromUser(String term) {
 		int[] dates = new int[2];
 		boolean validDate = false;
 		boolean start = true;

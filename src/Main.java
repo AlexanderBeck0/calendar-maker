@@ -4,13 +4,6 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-// Project requires:
-// aspose-cells-23.8
-// commons-collections4-4.1
-// poi-3.17
-// poi-ooxml-3.17
-// poi-ooxml-schemas-3.17
-// xmlbeans-2.6.0
 public class Main {
 	private static List<Course> courses;
 
@@ -86,7 +79,7 @@ public class Main {
 			Writer fileWriter = new OutputStreamWriter(new FileOutputStream(fileName), StandardCharsets.UTF_8);
 			fileWriter.write("BEGIN:VCALENDAR" + delim +
 					"VERSION:2.0" + delim +
-					"PRODID:<Alexs WPI Calendar>" + delim +
+					"PRODID:<My Calendar>" + delim +
 					"BEGIN:VTIMEZONE" + delim +
 					"TZID:America/New_York" + delim +
 					"BEGIN:DAYLIGHT" + delim +
